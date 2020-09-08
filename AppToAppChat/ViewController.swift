@@ -83,37 +83,41 @@ extension ViewController: NXMClientDelegate {
         
         switch status {
         case .connected:
-            self.statusLabel.text = "Connected"
+            setStatusLabel("Connected")
+            
             let navigationController = UINavigationController(rootViewController: ChatViewController(user: user))
             navigationController.modalPresentationStyle = .overFullScreen
             present(navigationController, animated: true, completion: nil)
         case .disconnected:
-            self.statusLabel.text = "Disconnected"
+            setStatusLabel("Disconnected")
         case .connecting:
-            self.statusLabel.text = "Connecting"
+            setStatusLabel("Connecting")
         @unknown default:
-            self.statusLabel.text = ""
+            setStatusLabel("")
         }
     }
     
     func client(_ client: NXMClient, didReceiveError error: Error) {
-        self.statusLabel.text = error.localizedDescription
+        setStatusLabel(error.localizedDescription)
+    }
+    
+    func setStatusLabel(_ newStatus: String?) {
+        DispatchQueue.main.async { [weak self] in
+            self?.statusLabel.text = newStatus
+        }
     }
 }
 
 struct User {
     let name: String
-    let uuid: String
     let jwt: String
     let chatPartnerName: String
     let conversationId = "CONVERSATION_ID"
     
     static let Alice = User(name: "Alice",
-                            uuid: "ALICE_USERID",
                             jwt:"ALICE_JWT",
                             chatPartnerName: "Bob")
     static let Bob = User(name: "Bob",
-                          uuid: "BOB_USERID",
                           jwt:"BOB_JWT",
                           chatPartnerName: "Alice")
 }
